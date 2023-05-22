@@ -1,3 +1,32 @@
+/* --------------------------------------------------------------------------------
+ *  Funções referentes a escrita Serial com o computador e o ESP
+ * -------------------------------------------------------------------------------- */
+
+// Inclusão da bibliotecas
+
+// Criação das variaveis
+
+void configuraSerial();
+void loopSerialEsp();
+
+
+void configuraSerial(){
+  
+}
+void loopSerialEsp(){
+  
+}
+
+
+
+
+
+
+
+
+
+
+
 // --- Funções externas ---
 extern void calibra(int modoCal);
 
