@@ -1,3 +1,5 @@
+#include <Wire.h>
+#include "Adafruit_MPR121.h"
 #include <MobaTools.h>
 
 MoToTimer Pause;

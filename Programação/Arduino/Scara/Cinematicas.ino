@@ -20,15 +20,19 @@ void configuraCinematica(){
 void homing(){
   
 }
+
 void posiciona(float angA,float angB,float angC,float altura){
-    
+      
 }
+
 void loopCinematica(){
   
 }
+
 void cinematicaDireta(){
   
 }
+
 void cinematicainversa(){
   
 }

@@ -8,7 +8,7 @@ void configuraIO();
 
 void configuraIO() {
   //Saidas diretas
-  pinMode(m12en, OUTPUT);
+  
   pinMode(m3en,  OUTPUT);
 
   //Entradas diretas
