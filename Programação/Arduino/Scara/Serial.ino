@@ -1,28 +1,115 @@
 /* --------------------------------------------------------------------------------
- *  Funções referentes a escrita Serial com o computador e o ESP
- * -------------------------------------------------------------------------------- */
+    Funções referentes a escrita Serial com o computador e o ESP
+   -------------------------------------------------------------------------------- */
 
 // Inclusão da bibliotecas
+//#include <SoftwareSerial.h>
+
+SoftwareSerial Seria(espTx, espRx); // RX, TX do arduino
 
 // Criação das variaveis
 
-void configuraSerial();
-void loopSerialEsp();
+char chegadaSerial;
+int situacao = 0; //em que etapa esta do recebimento de dados
+String dado = ""; //dado recebido
+String endereco = ""; //endereço da memoria a qual sera modificada
+String verificador = ""; //valor para identificar se os dados recebidos estão corretos
+int registradores[20]; //registro onde sera armazenado as informações a serem trocadas via modbus
 
 
-void configuraSerial(){
-  
+void configuraSerial(); // aqui inicia-se as seriais tanto com o pc como tambem com o ESP
+void loopSerialEsp(); // função a ser inserida no loop que efetua as funções de comunicação com o ESP
+
+
+void configuraSerial() {
+  Serial.begin(9600);
+  Seria.begin(9600);
 }
-void loopSerialEsp(){
-  
+
+void loopSerialEsp() {
+  leSerialEsp();
+  escreveSerialEsp();
+}
+
+void leSerialEsp() {
+  while (Seria.available() > 0) { // verifica se existe algum dado disponivel
+    chegadaSerial = Seria.read(); // armazena o primeiro byte
+    if (situacao == 2 || situacao == 3) { 
+      if (chegadaSerial == '!') { //identifica o terminador da frase, salvando o dado e limpando o buffer
+        salvaDado(); 
+        limpaBuffer();
+      }
+      if (chegadaSerial == ',') { //identifica o separador de variaveis, salva o dado lido e reinicia o processo
+        salvaDado();
+        situacao = 1;
+      }
+      if (situacao == 3) {
+        verificador.concat(chegadaSerial);
+      }
+      if (chegadaSerial != ',' && chegadaSerial != '!' && situacao != 3) {
+        if (chegadaSerial == '/') {
+          situacao = 3;
+        } else {
+          dado.concat(chegadaSerial);
+        }
+      }
+    }
+    if (situacao == 1) {
+      if (chegadaSerial == ':') {
+        situacao = 2;
+      } else {
+        endereco.concat(chegadaSerial);
+      }
+    }
+    if (chegadaSerial == '|') {
+      situacao = 1;
+    }
+  }
+}
+void escreveSerialEsp() {
+  Seria.print("|");
+  for (int cont = 0; cont <= 9; cont = cont + 1) {
+    Seria.print(cont);
+    Seria.print(':');
+    Seria.print(registradores[cont]);
+    Seria.print('/');
+    Seria.print(20 + cont + registradores[cont]);
+    if (cont == 9) {
+      Seria.println('!');
+    } else {
+      Seria.print(',');
+    }
+  }
+}
+
+void salvaDado() {
+  for (int cont = 0 ; cont < endereco.length(); cont = cont + 1) { //Verifica se existe algum caracter irregular
+    if (endereco.charAt(cont) == ',') {
+      endereco.remove(cont, 1);
+      cont = endereco.length() + 10;
+    }
+  }
+  if (endereco.toInt() > 9 && endereco.toInt() < 20) {
+    if ((endereco.toInt() + dado.toInt() + 20) == verificador.toInt()) {
+      registradores[endereco.toInt()] = dado.toInt();
+    }
+  }
+  dado = "";
+  endereco = "";
+  verificador = "";
+  situacao = 1;
+}
+
+void limpaBuffer() {
+  situacao = 0;
+  while (Seria.available()) {
+    Seria.read();
+  }
 }
 
 
 
-
-
-
-
+/* CODIGO DA PRIMEIRA VERSÃO ONDE AS FUNÇÕES OCORRIA VIA SERIAL
 
 
 
@@ -32,18 +119,13 @@ extern void calibra(int modoCal);
 
 
 // --- Funções locais ---
-void configuraSerial();
+//void configuraSerial();
 void verificaSerial();
 
 // --- variaveis externas ---
 extern bool calibrado1;
 extern bool calibrado2;
 extern bool calibrado3;
-
-
-void configuraSerial() {
-  Serial.begin(9600);
-}
 
 void verificaSerial() {
 
@@ -147,7 +229,7 @@ void verificaSerial() {
         if (calibrado3) {
           Serial.println("Sim");
           Serial.print("Posicao: ");
-          Serial.print(-1 *(Mot3.read() / 20));
+          Serial.print(-1 * (Mot3.read() / 20));
           Serial.println("°");
         } else {
           Serial.println("Não");
@@ -167,4 +249,4 @@ void verificaSerial() {
     //limpa Serial
   }
   Serial.flush();
-}
+}*/

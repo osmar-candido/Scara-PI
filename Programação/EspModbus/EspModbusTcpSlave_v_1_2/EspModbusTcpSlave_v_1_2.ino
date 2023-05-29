@@ -11,17 +11,17 @@
  * Fazer nas proximas versões:
  *     Permitir a conexão com IP estático;
  *     alterar a quantidade de variaveis e seus tipos a serem manipulados;
- *     receber via serial as configurações wifi, ip e dados.
+ *     receber via serial as configurações wifi, ip, status e permitir configurar o numero de registradores e seus tipos.
 ***********************/
 // Inclusão de bibliotecas
 #include <ESP8266WiFi.h>
 
 
 // Configuração dos dados Wifi
-//const char* ssid = "Scara_ModbusTCP";
-//const char* password = "projetoscara";
-const char* ssid = "FAMILIA CANDIDO_2.4G";
-const char* password = "954901jc";
+const char* ssid = "Scara_ModbusTCP";
+const char* password = "projetoscara";
+//const char* ssid = "FAMILIA CANDIDO_2.4G";
+//const char* password = "954901jc";
 
 
 int ModbusTCP_port = 502;
