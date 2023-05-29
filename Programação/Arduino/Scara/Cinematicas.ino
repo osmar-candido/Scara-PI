@@ -11,23 +11,23 @@
  *    * atualizar as variaveis da posição atual do braço e seu status
    -------------------------------------------------------------------------------- */
 /*
-// 0 e 1 é o tx e rx da serial com o computador
-#define m1stp 2   //saida para o step do drive do motor 1 
-#define m2stp 4   //saida para o step do drive do motor 2 
-#define m3stp 6   //saida para o step do drive do motor 3 
-#define m4stp 8   //saida para o step do drive do motor 4 
-#define m1dir 3   //saida para o dir  do drive do motor 1 
-#define m2dir 5   //saida para o dir  do drive do motor 2 
-#define m3dir 7   //saida para o dir  do drive do motor 3 
-#define m4dir 9   //saida para o dir  do drive do motor 4 
-#define efim  17  //A3   //Entrada do fim de curso para calibração do eixo 1, 2 e 3
-#define espTx 14  //A0  //Tx da comunicação com o esp modbus
-#define espRx 15  //A1  //Rx da comunicação com o esp modbus
-#define ss    10  //comunicação ISP com o leitor de cartão SD
-#define miso  12  //comunicação ISP com o leitor de cartão SD
-#define mosi  11  //comunicação ISP com o leitor de cartão SD
-#define sck   13  //comunicação ISP com o leitor de cartão SD
-#define servo 16  //A2  //PWM do Servo da garra
+  // 0 e 1 é o tx e rx da serial com o computador
+  #define m1stp 2   //saida para o step do drive do motor 1
+  #define m2stp 4   //saida para o step do drive do motor 2
+  #define m3stp 6   //saida para o step do drive do motor 3
+  #define m4stp 8   //saida para o step do drive do motor 4
+  #define m1dir 3   //saida para o dir  do drive do motor 1
+  #define m2dir 5   //saida para o dir  do drive do motor 2
+  #define m3dir 7   //saida para o dir  do drive do motor 3
+  #define m4dir 9   //saida para o dir  do drive do motor 4
+  #define efim  17  //A3   //Entrada do fim de curso para calibração do eixo 1, 2 e 3
+  #define espTx 14  //A0  //Tx da comunicação com o esp modbus
+  #define espRx 15  //A1  //Rx da comunicação com o esp modbus
+  #define ss    10  //comunicação ISP com o leitor de cartão SD
+  #define miso  12  //comunicação ISP com o leitor de cartão SD
+  #define mosi  11  //comunicação ISP com o leitor de cartão SD
+  #define sck   13  //comunicação ISP com o leitor de cartão SD
+  #define servo 16  //A2  //PWM do Servo da garra
 */
 
 // declaração das funções
@@ -53,6 +53,8 @@ byte garra = 0;
 //protótipos funções locais
 void configuraCinematica();
 void loopCinematica();
+void testeMotorSerial(char dadodaserial);
+
 extern void cinematicaDireta(int angA, int angB, int angC, long altura);
 extern void cinematicainversa(long setX, long setY, int angR, long altura);
 
@@ -61,23 +63,23 @@ extern void cinematicainversa(long setX, long setY, int angR, long altura);
 void configuraCinematica() {
   //Base
   Mot1.attach(m1stp, m1dir);  // STEPpin, DIRpin
-  Mot1.setSpeed(300);         // = 80/20 = 4 U/Min (velocidade maxima)
-  Mot1.setRampLen(100);       // 500 ms (rampa aceleração)
+  Mot1.setSpeed(10);         // = 80/20 = 4 U/Min (velocidade maxima)
+  Mot1.setRampLen(1);       // 500 ms (rampa aceleração)
 
   //Cotovelo
   Mot2.attach(m2stp, m2dir);  // STEPpin, DIRpin
-  Mot2.setSpeed(300);         // = 80/20 = 4 U/Min (velocidade maxima)
-  Mot2.setRampLen(100);       // 500 ms (rampa aceleração)
-  
+  Mot2.setSpeed(10);         // = 80/20 = 4 U/Min (velocidade maxima)
+  Mot2.setRampLen(1);       // 500 ms (rampa aceleração)
+
   //Punho
   Mot3.attach(m3stp, m3dir);  // STEPpin, DIRpin
-  Mot3.setSpeed(300);         // = 80/20 = 4 U/Min (velocidade maxima)
-  Mot3.setRampLen(100);       // 500 ms (rampa aceleração)
-  
+  Mot3.setSpeed(10);         // = 80/20 = 4 U/Min (velocidade maxima)
+  Mot3.setRampLen(1);       // 500 ms (rampa aceleração)
+
   //Eixo Z
-  Mot3.attach(m4stp, m4dir);  // STEPpin, DIRpin
-  Mot3.setSpeed(300);         // = 80/20 = 4 U/Min (velocidade maxima)
-  Mot3.setRampLen(100);       // 500 ms (rampa aceleração)
+  Mot4.attach(m4stp, m4dir);  // STEPpin, DIRpin
+  Mot4.setSpeed(10);         // = 80/20 = 4 U/Min (velocidade maxima)
+  Mot4.setRampLen(1);       // 500 ms (rampa aceleração)
 }
 
 void homing() {
@@ -173,10 +175,10 @@ void homing() {
 }
 
 void loopCinematica() {
-  if(selecaoCinematica == 0){
+  if (selecaoCinematica == 0) {
     //cinematicaDireta();
   }
-  if(selecaoCinematica == 1){
+  if (selecaoCinematica == 1) {
     //cinematicaInversa();
   }
 }
@@ -191,4 +193,35 @@ void ajustaVelocidade() {
   Mot3.attach(m3stp, m3dir);  // STEPpin, DIRpin
   Mot3.setSpeed(300);         // = 80/20 = 4 U/Min (velocidade maxima)
   Mot3.setRampLen(100);       // 100 ms (rampa aceleração)
+  Mot3.attach(m3stp, m3dir);  // STEPpin, DIRpin
+  Mot3.setSpeed(300);         // = 80/20 = 4 U/Min (velocidade maxima)
+  Mot3.setRampLen(100);       // 100 ms (rampa aceleração)
+}
+void testeMotorSerial(char dadodaserial) {
+  switch (dadodaserial) {
+    case 'a':
+      Mot1.move(50); // motor eixo z
+      break;
+    case 'z':
+      Mot1.move(-50);
+      break;
+    case 's':
+      Mot2.move(10);
+      break;
+    case 'x':
+      Mot2.move(-10);
+      break;
+    case 'd':
+      Mot3.move(10); // motor cotovelo
+      break;
+    case 'c':
+      Mot3.move(-10);
+      break;
+    case 'f':
+      Mot4.move(10); // motor punho
+      break;
+    case 'v':
+      Mot4.move(-10);
+      break;
+  }
 }

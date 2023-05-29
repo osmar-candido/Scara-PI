@@ -33,6 +33,7 @@ byte enderecoo;
 byte codigoResultado=0;
 byte dispositivosEncontrados=0;
 
+extern void testeMotorSerial(char dadodaserial);
 extern void configuraIO();
 extern void calibra(int modoCal);
 extern void configuraIO();
@@ -41,7 +42,7 @@ extern void configuraDisplay();
 extern void configuraBotoes();
 extern byte lerEntradasPCF8574();
 extern void loopBotoes();
-
+extern void configuraCinematica();
 void setup() {
   pinMode(m1stp, OUTPUT);
   pinMode(m2stp, OUTPUT);
@@ -55,8 +56,8 @@ void setup() {
   pinMode(servo, OUTPUT);
   Serial.begin(9600);
   configuraDisplay();
-  
   configuraBotoes();
+  configuraCinematica();
   
 }
 
@@ -64,5 +65,9 @@ int angulo = 0;
 
 void loop() {
   loopBotoes(); //funcionando o pcf e o mpr
+  if(Serial.available()>0){
+    char recebeSerial = Serial.read();
+    testeMotorSerial(recebeSerial);
+  }
   delay(1);
 }
