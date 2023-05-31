@@ -43,6 +43,10 @@ extern void configuraBotoes();
 extern byte lerEntradasPCF8574();
 extern void loopBotoes();
 extern void configuraCinematica();
+extern void homing();
+
+byte modo = 0; //0 = local(IHM/Serial) || 1 = remoto(ModbusTCP)
+
 void setup() {
   pinMode(m1stp, OUTPUT);
   pinMode(m2stp, OUTPUT);
@@ -64,10 +68,15 @@ void setup() {
 int angulo = 0;
 
 void loop() {
+  Serial.print(digitalRead(efim));
+  Serial.print("  ");
   loopBotoes(); //funcionando o pcf e o mpr
   if(Serial.available()>0){
     char recebeSerial = Serial.read();
     testeMotorSerial(recebeSerial);
+    if(recebeSerial == 'h'){
+      homing();      
+    }
   }
   delay(1);
 }

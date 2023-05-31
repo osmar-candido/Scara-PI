@@ -16,16 +16,23 @@ int tela_A = 0; // referente a tela principal
 byte grau = B11011111;
 long buf[4] = {0, 0, 0, 0};
 int prev_tela_A = 1000;
+
+//aqui tem 8 variaveis de prioridades, as quais podem interromper o funcionamento norma do display
+//primeiro bit é referente a tela da seleção do modo (local ou remoto)
+byte telaPrioridades = B00000000;
+
+
 //variaveis externas
-extern int selecaoCinematica; //0 = direta e 1 = inversa
-extern long X; //recebe o valor tratato de -99999 a 10000 milimetros
-extern long Y; //recebe o valor tratato de -99999 a 10000 milimetros
-extern long Z; //recebe o valor tratato de -99999 a 10000 milimetros
-extern int  A; //recebe o valor tratato de -360 a 360 graus
-extern int  B;//recebe o valor tratato de -360 a 360 graus
-extern int  C;//recebe o valor tratato de -360 a 360 graus
-extern int  R;//recebe o valor tratato de -360 a 360 graus
-extern byte garra; //recebe o valor tratato de 0 a 100%
+extern byte selecaoCinematica; //0 = direta e 1 = inversa
+extern long X;      //recebe o valor tratato de -99999 a 10000 milimetros
+extern long Y;      //recebe o valor tratato de -99999 a 10000 milimetros
+extern long Z;      //recebe o valor tratato de -99999 a 10000 milimetros
+extern int  A;      //recebe o valor tratato de -360 a 360 graus
+extern int  B;      //recebe o valor tratato de -360 a 360 graus
+extern int  C;      //recebe o valor tratato de -360 a 360 graus
+extern int  R;      //recebe o valor tratato de -360 a 360 graus
+extern byte garra;  //recebe o valor tratato de 0 a 100%
+extern byte modo;   //0 = local(IHM/Serial) || 1 = remoto(ModbusTCP)
 
 void configuraDisplay();
 void loopDisplay();
@@ -40,6 +47,10 @@ void configuraDisplay() {
 }
 
 void loopDisplay() {
+  if (bitRead(telaPrioridades, 0) == 1) {
+    tela_A = 3;
+  }
+
   if (tela_A != prev_tela_A) { //verifica se necessita mudar o plano de fundo
     lcd.clear(); //na teoria não sera necessário
     prev_tela_A = tela_A; // essa variavel serve para evitar atualização desnecessária do display
@@ -139,6 +150,26 @@ void loopDisplay() {
         lcd.print(garra);
         lcd.write(B00100101); //escreve o simbolo de %
       }
+      buf[0] = garra;
+      buf[1] = 0;
+      buf[2] = 0;
+      buf[3] = 0;
       break;
+    case 3:
+      if (buf[0] != modo) {
+        if (modo == 0) { //Operacao local
+          lcd.setCursor(0, 1);
+          lcd.print("                ");
+          lcd.setCursor(0, 1);
+          lcd.print("Local IHM/Serial");
+        }
+        if (modo == 1) { //Operacao Remota
+          lcd.setCursor(0, 1);
+          lcd.print("                ");
+          lcd.setCursor(0, 1);
+          lcd.print("Remoto ModbusTCP");
+
+        }
+      }
   }
 }
