@@ -232,26 +232,26 @@ void homing() {
 
 
 void cinematicaDireta(int disA, int angB, int angC, int angR) { //altura, base, cotovelo, punho
-  
+
   //verifica Limites de segurança
-  
+
   //escrita nos motores
   Mot1.writeSteps(round(100 * disA));
   Mot2.writeSteps(round(((800 * 16) / 360)* angB));
   Mot3.writeSteps(round(((800 * 16) / 360)* angC));
-  Mot4.writeSteps(round(((800 *  4) / 360)* angR));
+  Mot4.writeSteps(round(((800 *  4) / 360)* angR * -1));
 
   //escrita ihm
   float distanciaBasePunho = sqrt((distanciaBaseCotovelo ^ 2) + (distanciaCotoveloPunho ^ 2));
-  float angInterno = acos((pow(distanciaBaseCotovelo,2) + pow(distanciaBasePunho, 2) - (pow(distanciaCotoveloPunho, 2))) / 2 * (distanciaBaseCotovelo * distanciaBasePunho));
+  float angInterno = acos((pow(distanciaBaseCotovelo, 2) + pow(distanciaBasePunho, 2) - (pow(distanciaCotoveloPunho, 2))) / 2 * (distanciaBaseCotovelo * distanciaBasePunho));
   //Serial.println(angInterno*180/PI);
-  
+
   //caso cotovelo tiver angulo positivo
-  
-  
+
+
   //caso cotovelo tiver angulo negativo
-  
-  
+
+
   rX = 0;
   rY = 0;
   rZ = disA;
@@ -331,10 +331,10 @@ void testeMotorSerial(char dadodaserial) {
       break;
     case 'j':
       //Serial.print("Motor 2: ");
-     // Serial.println(Mot2.readSteps());
+      // Serial.println(Mot2.readSteps());
       break;
     case 'i':
-     // Serial.print("Motor 3: ");
+      // Serial.print("Motor 3: ");
       //Serial.println(Mot3.readSteps()); // motor punho sentido horario
       break;
     case 'k':

@@ -56,6 +56,7 @@ extern void loopSerialEsp();
 byte modo = 0; //0 = local(IHM/Serial) || 1 = remoto(ModbusTCP)
 
 void setup() {
+  //Define todos as saidas e entradas do arduino 
   pinMode(m1stp, OUTPUT);
   pinMode(m2stp, OUTPUT);
   pinMode(m3stp, OUTPUT);
@@ -67,22 +68,20 @@ void setup() {
   pinMode(efim, INPUT_PULLUP);
   pinMode(servo, OUTPUT);
   
-  configuraDisplay();
-  configuraBotoes();
-  configuraCinematica();
-  configuraSerial();
-  homing();
+  configuraDisplay(); //configura e inicia a comunicação com o display
+  configuraBotoes(); //configura e inicia a comunicação com o MPR121 e o PCF8574
+  configuraCinematica(); //configura e inicia a biblioteca responsável pelo controle dos motores
+  configuraSerial(); //configura e inicia a comunicação serial com o ESP
+  homing(); // efetua o homing do robô
 }
 
 int angulo = 0;
 
 void loop() {
-  //Serial.print(digitalRead(efim));
-  //Serial.print("  ");
-  loopBotoes(); //funcionando o pcf e o mpr
-  loopDisplay();
-  loopCinematica();
-  loopSerialEsp();
+  loopBotoes();   //efetua a leitura dos botoes e faz os comando conforme as variaves definidas
+  loopDisplay();  //efetua a leitura das variaveis de comando e exibe na tela
+  loopCinematica(); //controla todo o sistema de posiconamento com base nas variaveis definidas
+  loopSerialEsp(); //envia o comando para o esp atualizando os dados no modbus
   
-  delay(1);
+  delay(1); //delay desnecessário mas incluido para reduzir bugs de ruido(funciona n sei pq).
 }
