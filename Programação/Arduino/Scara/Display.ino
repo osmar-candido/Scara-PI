@@ -49,6 +49,8 @@ void configuraDisplay() {
 void loopDisplay() {
   if (bitRead(telaPrioridades, 0) == 1) {
     tela_A = 3;
+  } else {
+    tela_A = 1;
   }
 
   if (tela_A != prev_tela_A) { //verifica se necessita mudar o plano de fundo
@@ -65,7 +67,7 @@ void loopDisplay() {
         lcd.setCursor(0, 0);
         lcd.print("A:      B:      ");
         lcd.setCursor(0, 1);
-        lcd.print("Z:      C:      ");
+        lcd.print("R:      C:      ");
         break;
       case 2: //tela mostrando a situação da garra
         lcd.setCursor(0, 0);
@@ -78,6 +80,7 @@ void loopDisplay() {
         lcd.print("Modo de Operacao");
         lcd.setCursor(0, 1);
         lcd.print("                ");
+        buf[0] = 100;
         break;
     }
   }
@@ -125,11 +128,11 @@ void loopDisplay() {
         lcd.setCursor(10, 0);
         lcd.print(B);
       }
-      if (buf[2] != Z) {
+      if (buf[2] != R) {
         lcd.setCursor(2, 1);
         lcd.print("     ");
         lcd.setCursor(2, 1);
-        lcd.print(Z);
+        lcd.print(R);
       }
       if (buf[3] != C) {
         lcd.setCursor(10, 1);
@@ -139,7 +142,7 @@ void loopDisplay() {
       }
       buf[0] = A;
       buf[1] = B;
-      buf[2] = Z;
+      buf[2] = R;
       buf[3] = C;
       break;
     case 2:
@@ -170,6 +173,7 @@ void loopDisplay() {
           lcd.print("Remoto ModbusTCP");
 
         }
+        buf[0] = modo;
       }
   }
 }

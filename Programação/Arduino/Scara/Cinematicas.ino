@@ -28,6 +28,10 @@
   #define mosi  11  //comunicação ISP com o leitor de cartão SD
   #define sck   13  //comunicação ISP com o leitor de cartão SD
   #define servo 16  //A2  //PWM do Servo da garra
+
+  #define distanciaBaseCotovelo 150   // Distancia entre a base e o cotovelo
+  #define distanciaCotoveloPunho 150  // Distancia entre o cotovelo e o punho
+
 */
 
 // declaração das funções
@@ -41,33 +45,58 @@ MoToStepper Mot4(800, STEPDIR);
 // Criação das variaveis
 
 byte selecaoCinematica = 0; // 0 = direta e 1 = inversa
+
 long X = 0;
 long Y = 0;
 long Z = 0;
-int  A = 0;
-int  B = 0;
-int  C = 0;
-int  R = 0;
+int  A = -5; //altura Z
+int  B = -45; //Base
+int  C = -45; //Cotovelo
+int  R = 45; //Rotação Ferramenta
 byte garra = 0;
-int offset1 = 0;  //offset para o referenciamento
-int offset2 = 0;  //offset para o referenciamento
-int offset3 = 0;  //offset para o referenciamento
-int offset4 = 0;  //offset para o referenciamento
-int velocidadeMax1 = 300;
-int velocidadeMax2 = 300;
-int velocidadeMax3 = 300;
-int velocidadeMax4 = 300;
-int aceleracaoMax1 = 100;
-int aceleracaoMax2 = 100;
-int aceleracaoMax3 = 100;
-int aceleracaoMax4 = 100;
+
+long rX = 0;
+long rY = 0;
+long rZ = 0;
+int  rA = 0; //altura Z
+int  rB = 0; //Base
+int  rC = 0; //Cotovelo
+int  rR = 0; //Rotação Ferramenta
+
+
+
+#define offset1 -320  //offset para o referenciamento
+#define offset2 6600  //offset para o referenciamento
+#define offset3 5380  //offset para o referenciamento
+#define offset4 -1450  //offset para o referenciamento
+#define velocidadeMax1 300 //z
+#define velocidadeMax2 400 //base
+#define velocidadeMax3 400 //cotovelo
+#define velocidadeMax4 300 //punho
+#define aceleracaoMax1 200
+#define aceleracaoMax2 200
+#define aceleracaoMax3 100
+#define aceleracaoMax4 100
+#define limiteMaxBase 90    //°
+#define limiteMaxCotovelo 90 //°
+#define limiteMaxPunho 90    //°
+#define limiteMaxAltura 0    //°
+#define limiteMinBase -90   //°
+#define limiteMinCotovelo -90//°
+#define limiteMinPunho -90   //°
+#define limiteMinAltura -69  //mm
+
+
 
 //protótipos funções locais
 void ajustaVelocidade(int nivel); //ajusta a velocidade das juntas de 0 a 100%
 void configuraCinematica(); //colocado no setup ele configura os motores e seus valores iniciais
 void loopCinematica(); //colocado no loop, realiza todas as funções que envolvem a cinemática
-void testeMotorSerial(char dadodaserial); 
+void testeMotorSerial(char dadodaserial);
 void homing();
+void cinematicaDireta(int disA, int angB, int angC, long angR);
+void cinematicaInversa(long setX, long setY, int angR, long altura);
+
 
 extern void cinematicaDireta(int angA, int angB, int angC, long altura);
 extern void cinematicainversa(long setX, long setY, int angR, long altura);
@@ -118,7 +147,7 @@ void homing() {
       //gira cotovelo sentido antihorário 100 passos
       Mot3.move(100);
       delay(3000);
-      Serial.println("Moveu cotovelo");
+      //Serial.println("Moveu cotovelo");
       if (digitalRead(efim) == LOW) {
         //gira punho sentido antihorário -50 passos
         Mot4.move(-50);
@@ -129,7 +158,7 @@ void homing() {
           delay(3000);
           if (digitalRead(efim) == LOW) {
             //deu Ruim
-            Serial.println("Deu ruim");
+            //Serial.println("Deu ruim");
             while (true) {
               delay(1000);
             }
@@ -194,17 +223,69 @@ void homing() {
   delay(1000);
   Mot2.move(3000);
   delay(3000);
+  ajustaVelocidade(100);
+  Mot1.writeSteps(0);
+  Mot2.writeSteps(0);
+  Mot3.writeSteps(0);
+  Mot4.writeSteps(0);
+}
+
+
+void cinematicaDireta(int disA, int angB, int angC, int angR) { //altura, base, cotovelo, punho
+  
+  //verifica Limites de segurança
+  
+  //escrita nos motores
+  Mot1.writeSteps(round(100 * disA));
+  Mot2.writeSteps(round(((800 * 16) / 360)* angB));
+  Mot3.writeSteps(round(((800 * 16) / 360)* angC));
+  Mot4.writeSteps(round(((800 *  4) / 360)* angR));
+
+  //escrita ihm
+  float distanciaBasePunho = sqrt((distanciaBaseCotovelo ^ 2) + (distanciaCotoveloPunho ^ 2));
+  float angInterno = acos((pow(distanciaBaseCotovelo,2) + pow(distanciaBasePunho, 2) - (pow(distanciaCotoveloPunho, 2))) / 2 * (distanciaBaseCotovelo * distanciaBasePunho));
+  //Serial.println(angInterno*180/PI);
+  
+  //caso cotovelo tiver angulo positivo
+  
+  
+  //caso cotovelo tiver angulo negativo
+  
+  
+  rX = 0;
+  rY = 0;
+  rZ = disA;
+  rR = 0;
+}
+
+void cinematicaInversa(long setX, long setY, int angR, long altura) {
+  //escrita nos motores
+  Mot1.writeSteps(0);
+  Mot2.writeSteps(0);
+  Mot3.writeSteps(0);
+  Mot4.writeSteps(0);
+
+  //escrita ihm
+  rA = 0;
+  rB = 0;
+  rC = 0;
+  rR = 0;
 }
 
 void loopCinematica() {
   if (selecaoCinematica == 0) {
-    //cinematicaDireta();
+    cinematicaDireta(A, B, C, R);
   }
   if (selecaoCinematica == 1) {
-    //cinematicaInversa();
+    cinematicaInversa(X, Y, R, Z);
   }
 }
-void ajustaVelhocidade(int nivel) {
+
+
+
+
+
+void ajustaVelocidade(int nivel) {
   //velocidades préconfiguradas
 
   Mot1.setSpeed(map(nivel, 1, 100, 1, velocidadeMax1));     // = 80/20 = 4 U/Min (velocidade maxima)
@@ -217,10 +298,6 @@ void ajustaVelhocidade(int nivel) {
   Mot4.setRampLen(map(nivel, 1, 100, 1, aceleracaoMax1));       // 100 ms (rampa aceleração)
 
 }
-
-
-
-
 
 void testeMotorSerial(char dadodaserial) {
   switch (dadodaserial) {
@@ -247,6 +324,22 @@ void testeMotorSerial(char dadodaserial) {
       break;
     case 'v':
       Mot4.move(-100);
+      break;
+    case 'u':
+      //Serial.print("Motor 1: ");
+      //Serial.println(Mot1.readSteps()); // motor cotovelo sentido antihoraario
+      break;
+    case 'j':
+      //Serial.print("Motor 2: ");
+     // Serial.println(Mot2.readSteps());
+      break;
+    case 'i':
+     // Serial.print("Motor 3: ");
+      //Serial.println(Mot3.readSteps()); // motor punho sentido horario
+      break;
+    case 'k':
+      ///Serial.print("Motor 4: ");
+      //Serial.println(Mot4.readSteps());
       break;
   }
 }

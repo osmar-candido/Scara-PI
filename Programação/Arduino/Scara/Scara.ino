@@ -2,6 +2,7 @@
 #include "Adafruit_MPR121.h"
 #include <MobaTools.h>
 #include <SoftwareSerial.h>
+#include <math.h>
 
 MoToTimer Pause;
 
@@ -26,9 +27,12 @@ MoToTimer Pause;
 
 #define servo 16  //A2  //PWM do Servo da garra
 
+#define distanciaBaseCotovelo 150   // Distancia entre a base e o cotovelo
+#define distanciaCotoveloPunho 150  // Distancia entre o cotovelo e o punho
 
 #define TEMPOLEITURA 100
 #define TEMPOESPERA 3000
+
 byte enderecoo;
 byte codigoResultado=0;
 byte dispositivosEncontrados=0;
@@ -40,10 +44,14 @@ extern void configuraIO();
 extern void verificaSerial();
 extern void configuraDisplay();
 extern void configuraBotoes();
+extern void configuraSerial();
 extern byte lerEntradasPCF8574();
 extern void loopBotoes();
 extern void configuraCinematica();
+extern void loopDisplay();
 extern void homing();
+extern void loopCinematica();
+extern void loopSerialEsp();
 
 byte modo = 0; //0 = local(IHM/Serial) || 1 = remoto(ModbusTCP)
 
@@ -58,25 +66,23 @@ void setup() {
   pinMode(m4dir, OUTPUT);
   pinMode(efim, INPUT_PULLUP);
   pinMode(servo, OUTPUT);
-  Serial.begin(9600);
+  
   configuraDisplay();
   configuraBotoes();
   configuraCinematica();
-  
+  configuraSerial();
+  homing();
 }
 
 int angulo = 0;
 
 void loop() {
-  Serial.print(digitalRead(efim));
-  Serial.print("  ");
+  //Serial.print(digitalRead(efim));
+  //Serial.print("  ");
   loopBotoes(); //funcionando o pcf e o mpr
-  if(Serial.available()>0){
-    char recebeSerial = Serial.read();
-    testeMotorSerial(recebeSerial);
-    if(recebeSerial == 'h'){
-      homing();      
-    }
-  }
+  loopDisplay();
+  loopCinematica();
+  loopSerialEsp();
+  
   delay(1);
 }

@@ -17,13 +17,24 @@ String verificador = ""; //valor para identificar se os dados recebidos estão c
 int registradores[20]; //registro onde sera armazenado as informações a serem trocadas via modbus
 
 
+extern byte modo;
+extern long X;
+extern long Y;
+extern long Z;
+extern int  A; //altura Z
+extern int  B; //Base
+extern int  C; //Cotovelo
+extern int  R; //Rotação Ferramenta
+extern byte garra;
+
+
 void configuraSerial(); // aqui inicia-se as seriais tanto com o pc como tambem com o ESP
 void loopSerialEsp(); // função a ser inserida no loop que efetua as funções de comunicação com o ESP
 
 
 void configuraSerial() {
   Serial.begin(9600);
-  Seria.begin(9600);
+  //Seria.begin(9600);
 }
 
 void loopSerialEsp() {
@@ -32,11 +43,11 @@ void loopSerialEsp() {
 }
 
 void leSerialEsp() {
-  while (Seria.available() > 0) { // verifica se existe algum dado disponivel
-    chegadaSerial = Seria.read(); // armazena o primeiro byte
-    if (situacao == 2 || situacao == 3) { 
+  while (Serial.available() > 0) { // verifica se existe algum dado disponivel
+    chegadaSerial = Serial.read(); // armazena o primeiro byte
+    if (situacao == 2 || situacao == 3) {
       if (chegadaSerial == '!') { //identifica o terminador da frase, salvando o dado e limpando o buffer
-        salvaDado(); 
+        salvaDado();
         limpaBuffer();
       }
       if (chegadaSerial == ',') { //identifica o separador de variaveis, salva o dado lido e reinicia o processo
@@ -65,19 +76,61 @@ void leSerialEsp() {
       situacao = 1;
     }
   }
+  //atualiza variaveis importantes
+  if (modo == 1) { //comandos são recebidos via Modbus
+    if (registradores[10] != B) { // angulo da base
+      if (registradores[10] <= limiteMaxBase && registradores[10] >= limiteMinBase) {
+        B = registradores[10];
+      }
+    }
+    if (registradores[11] != C) { // angulo cotovelo
+      if (registradores[11] <= limiteMaxCotovelo && registradores[11] >= limiteMinCotovelo) {
+        C = registradores[11];
+      }
+    }
+    if (registradores[12] != R) { // angulo Ferramenta
+      if (registradores[12] <= limiteMaxPunho && registradores[12] >= limiteMinPunho) {
+        R = registradores[12];
+      }
+    }
+    if (registradores[13] != A) { // altura Z
+      if ((registradores[13] * -1) <= limiteMaxAltura && (registradores[13] * -1) >= limiteMinAltura) {
+        A = registradores[13] * -1;
+      }
+    }
+    /*
+        #define limiteMaxBase 90    //°
+      #define limiteMaxCotovelo 90 //°
+      #define limiteMaxPunho 90    //°
+      #define limiteMaxAltura 0    //°
+      #define limiteMinBase -90   //°
+      #define limiteMinCotovelo -90//°
+      #define limiteMinPunho -90   //°
+      #define limiteMinAltura -69  //mm*/
+    for (int cont = 0; cont < 20; cont = cont + 1) {
+      //Serial.print(registradores[cont]);
+      //Serial.print("  ");
+    }
+    //Serial.println(" ");
+
+
+
+
+
+  }
 }
 void escreveSerialEsp() {
-  Seria.print("|");
+  Serial.print("|");
   for (int cont = 0; cont <= 9; cont = cont + 1) {
-    Seria.print(cont);
-    Seria.print(':');
-    Seria.print(registradores[cont]);
-    Seria.print('/');
-    Seria.print(20 + cont + registradores[cont]);
+    Serial.print(cont);
+    Serial.print(':');
+    Serial.print(registradores[cont]);
+    Serial.print('/');
+    Serial.print(20 + cont + registradores[cont]);
     if (cont == 9) {
-      Seria.println('!');
+      Serial.println('!');
     } else {
-      Seria.print(',');
+      Serial.print(',');
     }
   }
 }
@@ -102,8 +155,8 @@ void salvaDado() {
 
 void limpaBuffer() {
   situacao = 0;
-  while (Seria.available()) {
-    Seria.read();
+  while (Serial.available()) {
+    Serial.read();
   }
 }
 
@@ -114,20 +167,20 @@ void limpaBuffer() {
 
 
 
-// --- Funções externas ---
-extern void calibra(int modoCal);
+  // --- Funções externas ---
+  extern void calibra(int modoCal);
 
 
-// --- Funções locais ---
-//void configuraSerial();
-void verificaSerial();
+  // --- Funções locais ---
+  //void configuraSerial();
+  void verificaSerial();
 
-// --- variaveis externas ---
-extern bool calibrado1;
-extern bool calibrado2;
-extern bool calibrado3;
+  // --- variaveis externas ---
+  extern bool calibrado1;
+  extern bool calibrado2;
+  extern bool calibrado3;
 
-void verificaSerial() {
+  void verificaSerial() {
 
   char comando;
   int fcomando;
@@ -249,4 +302,4 @@ void verificaSerial() {
     //limpa Serial
   }
   Serial.flush();
-}*/
+  }*/
