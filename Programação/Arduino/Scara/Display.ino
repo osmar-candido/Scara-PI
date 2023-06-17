@@ -14,7 +14,7 @@ LiquidCrystal_I2C lcd(0x22, 16, 2); // endereço do LCD em 0x27 16 colunas 2 lin
 //variaveis locais
 int tela_A = 0; // referente a tela principal
 byte grau = B11011111;
-long buf[4] = {0, 0, 0, 0};
+long buf[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 int prev_tela_A = 1000;
 
 //aqui tem 8 variaveis de prioridades, as quais podem interromper o funcionamento norma do display
@@ -31,8 +31,10 @@ extern int  A;      //recebe o valor tratato de -360 a 360 graus
 extern int  B;      //recebe o valor tratato de -360 a 360 graus
 extern int  C;      //recebe o valor tratato de -360 a 360 graus
 extern int  R;      //recebe o valor tratato de -360 a 360 graus
-extern byte garra;  //recebe o valor tratato de 0 a 100%
+extern byte F;  //recebe o valor tratato de 0 a 100%
 extern byte modo;   //0 = local(IHM/Serial) || 1 = remoto(ModbusTCP)
+extern byte funcao;
+extern byte multiplicador;
 
 void configuraDisplay();
 void loopDisplay();
@@ -51,6 +53,29 @@ void loopDisplay() {
     tela_A = 3;
   } else {
     tela_A = 1;
+  }
+
+  //tela_A = tela_A + (funcao * 5);
+  if(selecaoCinematica == 0){
+    if(funcao == 1){
+      tela_A = 5;
+    }
+    if(funcao == 2){
+      tela_A = 6;
+    }
+    if(funcao == 3){
+      tela_A = 7;
+    }
+  }else{
+    if(funcao == 1){
+      tela_A = 10;
+    }
+    if(funcao == 2){
+      tela_A = 11;
+    }
+    if(funcao == 3){
+      tela_A = 12;
+    }
   }
 
   if (tela_A != prev_tela_A) { //verifica se necessita mudar o plano de fundo
@@ -80,7 +105,57 @@ void loopDisplay() {
         lcd.print("Modo de Operacao");
         lcd.setCursor(0, 1);
         lcd.print("                ");
-        buf[0] = 100;
+        break;
+      case 5: //tela mostrando a funcao 1
+        lcd.setCursor(0, 0);
+        lcd.print("   Altur:        ");
+        lcd.setCursor(0, 1);
+        lcd.print("   Base:         ");
+        buf[0] = 1000;
+        buf[1] = 1000;
+        buf[2] = 1000;
+        buf[3] = 1000;
+        buf[4] = 1000;
+        buf[5] = 1000;
+        buf[6] = 1000;
+        buf[7] = 1000;
+        buf[8] = 
+        //buf[5] = 0;
+        break;
+      case 6: //tela mostrando a funcao 2
+        lcd.setCursor(0, 0);
+        lcd.print("   Cotov:        ");
+        lcd.setCursor(0, 1);
+        lcd.print("   Punho:        ");
+        buf[5] = 0;
+        break;
+      case 7: //tela mostrando a funcao 3
+        lcd.setCursor(0, 0);
+        lcd.print("   Garra:        ");
+        lcd.setCursor(0, 1);
+        lcd.print("   Vel..:        ");
+        buf[5] = 0;
+        break;
+      case 10: //tela mostrando a funcao 1
+        lcd.setCursor(0, 0);
+        lcd.print("   Y:            ");
+        lcd.setCursor(0, 1);
+        lcd.print("   X:            ");
+        buf[5] = 0;
+        break;
+      case 11: //tela mostrando a funcao 2
+        lcd.setCursor(0, 0);
+        lcd.print("   Z:            ");
+        lcd.setCursor(0, 1);
+        lcd.print("   Punho:        ");
+        buf[5] = 0;
+        break;
+      case 12: //tela mostrando a funcao 3
+        lcd.setCursor(0, 0);
+        lcd.print("   Garra:        ");
+        lcd.setCursor(0, 1);
+        lcd.print("   Vel..:        ");
+        buf[5] = 0;
         break;
     }
   }
@@ -146,14 +221,14 @@ void loopDisplay() {
       buf[3] = C;
       break;
     case 2:
-      if (buf[0] != garra) {
+      if (buf[0] != F) {
         lcd.setCursor(0, 1);
         lcd.print("                ");
         lcd.setCursor(5, 1);
-        lcd.print(garra);
+        lcd.print(F);
         lcd.write(B00100101); //escreve o simbolo de %
       }
-      buf[0] = garra;
+      buf[0] = F;
       buf[1] = 0;
       buf[2] = 0;
       buf[3] = 0;
@@ -175,5 +250,151 @@ void loopDisplay() {
         }
         buf[0] = modo;
       }
+      break;
+    case 5:
+      if (buf[0] != A) { //verifica se houve alteração na variavel e reescreve >> serve para todos os proximos
+        lcd.setCursor(10, 0);
+        lcd.print("     ");
+        lcd.setCursor(10, 0);
+        lcd.print(A);
+        buf[0] = A;
+      }
+      if (buf[1] != B) { //verifica se houve alteração na variavel e reescreve >> serve para todos os proximos
+        lcd.setCursor(10, 1);
+        lcd.print("     ");
+        lcd.setCursor(10, 1);
+        lcd.print(B);
+        buf[1] = B;
+      }
+      if (buf[5] != multiplicador) { //verifica se houve alteração na variavel e reescreve >> serve para todos os proximos
+        lcd.setCursor(0, 1);
+        lcd.print("   ");
+        lcd.setCursor(0, 1);
+        lcd.print(multiplicador);
+        buf[5] = multiplicador;
+      }
+    break; 
+    case 6:
+      if (buf[0] != C) { //verifica se houve alteração na variavel e reescreve >> serve para todos os proximos
+        lcd.setCursor(10, 0);
+        lcd.print("     ");
+        lcd.setCursor(10, 0);
+        lcd.print(C);
+        buf[0] = C;
+      }
+      if (buf[1] != R) { //verifica se houve alteração na variavel e reescreve >> serve para todos os proximos
+        lcd.setCursor(10, 1);
+        lcd.print("     ");
+        lcd.setCursor(10, 1);
+        lcd.print(R);
+        buf[1] = R;
+      }
+      if (buf[5] != multiplicador) { //verifica se houve alteração na variavel e reescreve >> serve para todos os proximos
+        lcd.setCursor(0, 1);
+        lcd.print("   ");
+        lcd.setCursor(0, 1);
+        lcd.print(multiplicador);
+        buf[5] = multiplicador;
+      }
+    break; 
+    case 7:
+      if (buf[0] != X) { //verifica se houve alteração na variavel e reescreve >> serve para todos os proximos
+        lcd.setCursor(10, 0);
+        lcd.print("     ");
+        lcd.setCursor(10, 0);
+        lcd.print("sla");
+        buf[0] = X;
+      }
+      if (buf[1] != Vel) { //verifica se houve alteração na variavel e reescreve >> serve para todos os proximos
+        lcd.setCursor(10, 1);
+        lcd.print("     ");
+        lcd.setCursor(10, 1);
+        lcd.print(Vel);
+        buf[1] = Vel;
+      }
+      if (buf[5] != multiplicador) { //verifica se houve alteração na variavel e reescreve >> serve para todos os proximos
+        lcd.setCursor(0, 1);
+        lcd.print("   ");
+        lcd.setCursor(0, 1);
+        lcd.print(multiplicador);
+        buf[5] = multiplicador;
+      }
+    break; 
+    case 10:
+      if (buf[0] != Y) { //verifica se houve alteração na variavel e reescreve >> serve para todos os proximos
+        lcd.setCursor(10, 0);
+        lcd.print("     ");
+        lcd.setCursor(10, 0);
+        lcd.print(Y);
+        buf[0] = Y;
+      }
+      if (buf[1] != X) { //verifica se houve alteração na variavel e reescreve >> serve para todos os proximos
+        lcd.setCursor(10, 1);
+        lcd.print("     ");
+        lcd.setCursor(10, 1);
+        lcd.print(X);
+        buf[1] = X;
+      }
+      if (buf[5] != multiplicador) { //verifica se houve alteração na variavel e reescreve >> serve para todos os proximos
+        lcd.setCursor(0, 1);
+        lcd.print("   ");
+        lcd.setCursor(0, 1);
+        lcd.print(multiplicador);
+        buf[5] = multiplicador;
+      }
+    break; 
+    case 11:
+      if (buf[0] != Z) { //verifica se houve alteração na variavel e reescreve >> serve para todos os proximos
+        lcd.setCursor(10, 0);
+        lcd.print("     ");
+        lcd.setCursor(10, 0);
+        lcd.print(Z);
+        buf[0] = Z;
+      }
+      if (buf[1] != R) { //verifica se houve alteração na variavel e reescreve >> serve para todos os proximos
+        lcd.setCursor(10, 1);
+        lcd.print("     ");
+        lcd.setCursor(10, 1);
+        lcd.print(R);
+        buf[1] = R;
+      }
+      if (buf[5] != multiplicador) { //verifica se houve alteração na variavel e reescreve >> serve para todos os proximos
+        lcd.setCursor(0, 1);
+        lcd.print("   ");
+        lcd.setCursor(0, 1);
+        lcd.print(multiplicador);
+        buf[5] = multiplicador;
+      }
+    break; 
+    case 12:
+      if (buf[0] != X) { //verifica se houve alteração na variavel e reescreve >> serve para todos os proximos
+        lcd.setCursor(10, 0);
+        lcd.print("     ");
+        lcd.setCursor(10, 0);
+        lcd.print("Sla");
+        buf[0] = X;
+      }
+      if (buf[5] != multiplicador) { //verifica se houve alteração na variavel e reescreve >> serve para todos os proximos
+        lcd.setCursor(0, 1);
+        lcd.print("   ");
+        lcd.setCursor(0, 1);
+        lcd.print(multiplicador);
+        buf[5] = multiplicador;
+      }
+      if (buf[1] != Vel) { //verifica se houve alteração na variavel e reescreve >> serve para todos os proximos
+        lcd.setCursor(10, 1);
+        lcd.print("     ");
+        lcd.setCursor(10, 1);
+        lcd.print(Vel);
+        buf[1] = Vel;
+      }
+      if (buf[5] != multiplicador) { //verifica se houve alteração na variavel e reescreve >> serve para todos os proximos
+        lcd.setCursor(0, 1);
+        lcd.print("   ");
+        lcd.setCursor(0, 1);
+        lcd.print(multiplicador);
+        buf[5] = multiplicador;
+      }
+    break;  
   }
 }

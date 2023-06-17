@@ -27,8 +27,8 @@ MoToTimer Pause;
 
 #define servo 16  //A2  //PWM do Servo da garra
 
-#define distanciaBaseCotovelo 150   // Distancia entre a base e o cotovelo
-#define distanciaCotoveloPunho 150  // Distancia entre o cotovelo e o punho
+#define distanciaBaseCotovelo 228   // Distancia entre a base e o cotovelo em milimetro
+#define distanciaCotoveloPunho 144  // Distancia entre o cotovelo e o punho em milimetro
 
 #define TEMPOLEITURA 100
 #define TEMPOESPERA 3000
@@ -36,6 +36,8 @@ MoToTimer Pause;
 byte enderecoo;
 byte codigoResultado=0;
 byte dispositivosEncontrados=0;
+byte emergenciaModbus = 0;
+byte emergencia = 0;
 
 extern void testeMotorSerial(char dadodaserial);
 extern void configuraIO();
