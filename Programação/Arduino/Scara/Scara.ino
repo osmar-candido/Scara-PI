@@ -25,7 +25,7 @@ MoToTimer Pause;
 #define mosi  11  //comunicação ISP com o leitor de cartão SD
 #define sck   13  //comunicação ISP com o leitor de cartão SD
 
-#define servo 16  //A2  //PWM do Servo da garra
+#define servoPin 16  //A2  //PWM do Servo da garra
 
 #define distanciaBaseCotovelo 228   // Distancia entre a base e o cotovelo em milimetro
 #define distanciaCotoveloPunho 144  // Distancia entre o cotovelo e o punho em milimetro
@@ -68,7 +68,7 @@ void setup() {
   pinMode(m3dir, OUTPUT);
   pinMode(m4dir, OUTPUT);
   pinMode(efim, INPUT_PULLUP);
-  pinMode(servo, OUTPUT);
+  pinMode(servoPin, OUTPUT);
   
   configuraDisplay(); //configura e inicia a comunicação com o display
   configuraBotoes(); //configura e inicia a comunicação com o MPR121 e o PCF8574
@@ -83,7 +83,7 @@ void loop() {
   loopBotoes();   //efetua a leitura dos botoes e faz os comando conforme as variaves definidas
   loopDisplay();  //efetua a leitura das variaveis de comando e exibe na tela
   loopCinematica(); //controla todo o sistema de posiconamento com base nas variaveis definidas
-  loopSerialEsp(); //envia o comando para o esp atualizando os dados no modbus
+  //loopSerialEsp(); //envia o comando para o esp atualizando os dados no modbus
   
   delay(1); //delay desnecessário mas incluido para reduzir bugs de ruido(funciona n sei pq).
 }

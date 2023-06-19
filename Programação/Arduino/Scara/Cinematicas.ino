@@ -44,7 +44,7 @@ MoToStepper Mot1(800, STEPDIR);
 MoToStepper Mot2(800, STEPDIR);
 MoToStepper Mot3(800, STEPDIR);
 MoToStepper Mot4(800, STEPDIR);
-
+MoToServo servo;
 
 // Criação das variaveis
 
@@ -54,9 +54,9 @@ long X = 0;
 long Y = 0;
 long Z = 0;
 int  A = -5; //altura Z
-int  B = -45; //Base
-int  C = -45; //Cotovelo
-int  R = 45; //Rotação Ferramenta
+int  B = 0; //Base
+int  C = 0; //Cotovelo
+int  R = 0; //Rotação Ferramenta
 byte F = 100; //abertura da Ferramenta
 byte Vel = 100;
 
@@ -133,6 +133,10 @@ void configuraCinematica() {
   Mot4.attach(m4stp, m4dir);  // STEPpin, DIRpin
   Mot4.setSpeed(200);         // = 80/20 = 4 U/Min (velocidade maxima)
   Mot4.setRampLen(70);       // 500 ms (rampa aceleração)
+
+  //Garra
+  servo.attach(16);
+  servo.setSpeed(100);
 }
 
 void homing() {
@@ -242,6 +246,9 @@ void homing() {
 
 float distanciaBasePunho = 0.0;
 float angInterno = 0.0;
+void setGarra(int setPointGarra){
+  servo.write(setPointGarra);
+}
 void cinematicaDireta(int disA, int angB, int angC, int angR) { //altura, base, cotovelo, punho
 
   //Verifica Limites de segurança

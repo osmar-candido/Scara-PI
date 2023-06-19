@@ -121,21 +121,21 @@ void loopBotoes() { //usa em conjunto a biblioteca mobatools para as funções d
       if(modo == 0){
         switch (funcao){
           case 1:
-            if(selecaoCinematica == 0){ //direta
+            if(selecaoCinematica == 0){ //baixo
               A = A - (1*multiplicador);
             }else{ //inversa
               Y = Y - (1*multiplicador);
             }
           break;
           case 2:
-            if(selecaoCinematica == 0){ //direta
+            if(selecaoCinematica == 0){ //baixo
               C = C - (1*multiplicador);
             }else{ //inversa
               Z = Z - (1*multiplicador);
             }
           break;
           case 3:
-            if(selecaoCinematica == 0){ //direta
+            if(selecaoCinematica == 0){ //baixo
               Vel = Vel - (1*multiplicador);
             }else{ //inversa
               Vel = Vel - (1*multiplicador);
@@ -153,24 +153,24 @@ void loopBotoes() { //usa em conjunto a biblioteca mobatools para as funções d
       if(modo == 0){
         switch (funcao){
           case 1:
-            if(selecaoCinematica == 0){ //direta
+            if(selecaoCinematica == 0){ //esquerda
               B = B - (1*multiplicador);
             }else{ //inversa
               X = X - (1*multiplicador);
             }
           break;
           case 2:
-            if(selecaoCinematica == 0){ //direta
+            if(selecaoCinematica == 0){ //esquerda
               R = R - (1*multiplicador);
             }else{ //inversa
               R = R - (1*multiplicador);
             }
           break;
           case 3:
-            if(selecaoCinematica == 0){ //direta
-              //Vel = Vel - (1*multiplicador);
+            if(selecaoCinematica == 0){ //esquerda
+              F = F - (1*multiplicador);
             }else{ //inversa
-              //Vel = Vel - (1*multiplicador);
+              F = F - (1*multiplicador);
             }
           break;
         }
@@ -200,9 +200,9 @@ void loopBotoes() { //usa em conjunto a biblioteca mobatools para as funções d
           break;
           case 3:
             if(selecaoCinematica == 0){ //direta
-              //Garra = Garra + (1*multiplicador);
+              //F = F + (1*multiplicador);
             }else{ //inversa
-              //Garra = Garra + (1*multiplicador);
+              //F = F + (1*multiplicador);
             }
           break;
         }
