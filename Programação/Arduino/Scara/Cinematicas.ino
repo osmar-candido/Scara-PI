@@ -53,11 +53,11 @@ byte selecaoCinematica = 0; // 0 = direta e 1 = inversa
 long X = 0;
 long Y = 0;
 long Z = 0;
-int  A = -5; //altura Z
+int  A = 0; //altura Z
 int  B = 0; //Base
 int  C = 0; //Cotovelo
 int  R = 0; //Rotação Ferramenta
-byte F = 100; //abertura da Ferramenta
+byte F = 0; //abertura da Ferramenta
 byte Vel = 100;
 
 long rX = 0;
@@ -136,7 +136,7 @@ void configuraCinematica() {
 
   //Garra
   servo.attach(16);
-  servo.setSpeed(100);
+  servo.setSpeed(10);
 }
 
 void homing() {
@@ -151,7 +151,16 @@ void homing() {
   Mot4.setSpeed(50); //punho
   Mot4.setRampLen(1);
 
-  //Verifica se nenhum fim de curso está pressionado e corrige caso estiver
+  X = 0;
+  Y = 0;
+  Z = 0;
+  A = -5; //altura Z
+  B = 0; //Base
+  C = 0; //Cotovelo
+  R = 0; //Rotação Ferramenta
+  F = 0; //abertura da Ferramenta
+  Vel = 100;
+             //Verifica se nenhum fim de curso está pressionado e corrige caso estiver
 
   if (digitalRead(efim) == LOW) {
     //gira motor da base antihorário 100 passos
@@ -246,24 +255,28 @@ void homing() {
 
 float distanciaBasePunho = 0.0;
 float angInterno = 0.0;
-void setGarra(int setPointGarra){
+
+
+void setGarra(int setPointGarra) {
   servo.write(setPointGarra);
 }
+
+
 void cinematicaDireta(int disA, int angB, int angC, int angR) { //altura, base, cotovelo, punho
 
   //Verifica Limites de segurança
-   
+
   if (angB <= limiteMaxBase && angB >= limiteMinBase) {
-    Mot2.writeSteps(round(((800 * 20) / 360)* angB));  
+    Mot2.writeSteps(round(((800 * 20) / 360)* angB));
   }
   if (angC <= limiteMaxCotovelo && angC >= limiteMinCotovelo) {
-    Mot3.writeSteps(round(((800 * 16) / 360)* angC));  
+    Mot3.writeSteps(round(((800 * 16) / 360)* angC));
   }
   if (angR <= limiteMaxPunho && angR >= limiteMinPunho) {
-    Mot4.writeSteps(round(((800 * 4) / 360)* angR));  
+    Mot4.writeSteps(round(((800 * 4) / 360)* angR));
   }
   if (disA <= limiteMaxAltura && disA >= limiteMinAltura) {
-    Mot1.writeSteps(round(100 * disA));  
+    Mot1.writeSteps(round(100 * disA));
   }
 
   //Calcula a distancia entre a base e o Punho
@@ -274,36 +287,36 @@ void cinematicaDireta(int disA, int angB, int angC, int angR) { //altura, base, 
   //Calcula o angulo entre a hipotenusa e o elo Base:Cotovelo
   angInterno = acos((pow(distanciaBaseCotovelo, 2) + pow(distanciaBasePunho, 2) - (pow(distanciaCotoveloPunho, 2))) / (2 * (distanciaBaseCotovelo * distanciaBasePunho)));
   registradores[1] = round(degrees(angInterno));
-  
+
   //se o cotovelo tiver angulo positivo e soma da base com o angulo interno for maior que 0 Situação = 3
   //se o cotovelo tiver angulo positivo e soma da base com o angulo interno for menor que 0 Situação = 1
   //se o cotovelo tiver angulo negativo e subtração da base com o angulo interno for maior que 0 Situação = 4
   //se o cotovelo tiver angulo negativo e subtração da base com o angulo interno for menor que 0 Situação = 2
 
-  
+
   //situação 1
-  if(angC >= 0 && (angB + degrees(angInterno)) < 0){
+  if (angC >= 0 && (angB + degrees(angInterno)) < 0) {
     registradores[4] = 1;
     rX = round(cos(radians(angB) + radians(90) + angInterno) * distanciaBasePunho);
     rY = round(sin(radians(angB) + radians(90) + angInterno) * distanciaBasePunho);
   }
   //situação 2
-  if(angC < 0 && (angB - degrees(angInterno)) < 0){
+  if (angC < 0 && (angB - degrees(angInterno)) < 0) {
     registradores[4] = 2;
     rX = round(cos(radians(angB) - angInterno + radians(90) ) * distanciaBasePunho);
     rY = round(sin(radians(angB) + radians(90) - angInterno) * distanciaBasePunho);
   }
   //situação 3
-  if(angC >= 0 && (angB + degrees(angInterno)) >= 0){
+  if (angC >= 0 && (angB + degrees(angInterno)) >= 0) {
     registradores[4] = 3;
     rX = round( cos(radians(180) - (radians(angB) + radians(90) + angInterno)) * distanciaBasePunho * (-1));
     rY = round(sin(radians(180) - (radians(angB) + radians(90) + angInterno)) * distanciaBasePunho);
   }
   //situação 4
-  if(angC < 0 && (angB - degrees(angInterno)) >= 0){
+  if (angC < 0 && (angB - degrees(angInterno)) >= 0) {
     registradores[4] = 4;
-    rX = round(cos(radians(180)-(radians(angB) + radians(90) - angInterno)) * distanciaBasePunho * (-1));
-    rY = round(sin(radians(180)-(radians(angB) + radians(90) - angInterno)) * distanciaBasePunho);
+    rX = round(cos(radians(180) - (radians(angB) + radians(90) - angInterno)) * distanciaBasePunho * (-1));
+    rY = round(sin(radians(180) - (radians(angB) + radians(90) - angInterno)) * distanciaBasePunho);
   }
   registradores[8] = rX;
   registradores[9] = rY;
@@ -313,15 +326,15 @@ void cinematicaDireta(int disA, int angB, int angC, int angR) { //altura, base, 
 }
 
 void cinematicaInversa(long setX, long setY, int angR, long altura) {
-  if(setX == 0){ //o valor não pode ser 0 devido aos calculos
+  if (setX == 0) { //o valor não pode ser 0 devido aos calculos
     setX = 1;
   }
-  if(setY == 0){ //o valor não pode ser 0 devido aos calculos
+  if (setY == 0) { //o valor não pode ser 0 devido aos calculos
     setY = 1;
-  }  
+  }
   float distanciaBasePunho = sqrt(pow(setX, 2) + pow(setY, 2));
-  float angOrigemBase = degrees(atan(setY/sqrt(pow(setX,2)))); //radianos
-  
+  float angOrigemBase = degrees(atan(setY / sqrt(pow(setX, 2)))); //radianos
+
   float angInternoCotovelo = degrees(acos(( pow(distanciaBaseCotovelo, 2) + pow(distanciaCotoveloPunho, 2) - pow(distanciaBasePunho, 2)) / (2 * distanciaBaseCotovelo * distanciaCotoveloPunho)));
   float angInternoBase = degrees(acos(( pow(distanciaBaseCotovelo, 2) + pow(distanciaBasePunho, 2) - pow(distanciaCotoveloPunho, 2)) / (2 * distanciaBaseCotovelo * distanciaBasePunho)));
   float angInternoFerramenta = 180 - angInternoBase - angInternoCotovelo;
@@ -331,113 +344,113 @@ void cinematicaInversa(long setX, long setY, int angR, long altura) {
   float sol2_Base;
   float sol2_Cotovelo;
   float sol2_Punho;
-  
 
-  if(setX > 0){
+
+  if (setX > 0) {
     //solução 1 X positivo
     //angulo Base
-    sol1_Base = angOrigemBase - angInternoBase - 90; 
+    sol1_Base = angOrigemBase - angInternoBase - 90;
     //angulo Cotovelo
     sol1_Cotovelo = 180 - angInternoCotovelo;
     //angulo Punho
-    sol1_Punho = angR - angInternoFerramenta - degrees(atan(setX/setY)) - 90;
+    sol1_Punho = angR - angInternoFerramenta - degrees(atan(setX / setY)) - 90;
     //solução 2 X positivo
     //angulo Base
     sol2_Base = angOrigemBase + angInternoBase - 90;
     //angulo Cotovelo
     sol2_Cotovelo = 0 - angInternoCotovelo;
     //angulo Punho
-    sol2_Punho = angR + angInternoFerramenta + degrees(atan(setX/setY)) - 90;
-  }else{
+    sol2_Punho = angR + angInternoFerramenta + degrees(atan(setX / setY)) - 90;
+  } else {
     //solução 3 X negativo
     //angulo Base
-    sol1_Base = 90 - angOrigemBase - angInternoBase - 90; 
+    sol1_Base = 90 - angOrigemBase - angInternoBase - 90;
     //angulo Cotovelo
     sol1_Cotovelo = 0 - angInternoCotovelo;
     //angulo Punho
-    sol1_Punho = angR + angInternoFerramenta + degrees(atan((setX * -1)/setY)) - 90;
+    sol1_Punho = angR + angInternoFerramenta + degrees(atan((setX * -1) / setY)) - 90;
 
     //solução 4 X negativo
     //angulo Base
-    sol2_Base = 90 - angOrigemBase + angInternoBase - 90; 
+    sol2_Base = 90 - angOrigemBase + angInternoBase - 90;
     //angulo Cotovelo
     sol2_Cotovelo = 180 - angInternoCotovelo;
     //angulo Punho
-    sol2_Punho = angR - angInternoFerramenta - degrees(atan((setX * -1)/setY)) - 90;
+    sol2_Punho = angR - angInternoFerramenta - degrees(atan((setX * -1) / setY)) - 90;
   }
-  
-  //avalia qual das 2 soluções é a mais proxima 
+
+  //avalia qual das 2 soluções é a mais proxima
   //é possivel definir de 2 formas, pela soma de todos os passos ou pela soma do que necessita de mais passos
   long passos[4] = {0, 0, 0, 0};
-  long comparador[2] = {0, 0}; 
-  
+  long comparador[2] = {0, 0};
+
   /*if(Mot1.readSteps() >= round(100 * altura)){ // passos Z não preciso saber disso pois é igual para ambos
     passos[0] = Mot1.readSteps() - round(100 * altura);
-  }else{
-    passos[0] = round(100 * altura) - Mot1.readSteps(); 
-  }*/
+    }else{
+    passos[0] = round(100 * altura) - Mot1.readSteps();
+    }*/
 
-  if(Mot2.readSteps() >= round(((800 * 20) / 360) * sol1_Base)){ // Passos na Base
+  if (Mot2.readSteps() >= round(((800 * 20) / 360) * sol1_Base)) { // Passos na Base
     passos[1] = Mot2.readSteps() - round(((800 * 20) / 360) * sol1_Base);
-  }else{
-    passos[1] = round(((800 * 20) / 360) * sol1_Base) - Mot2.readSteps(); 
+  } else {
+    passos[1] = round(((800 * 20) / 360) * sol1_Base) - Mot2.readSteps();
   }
 
-  if(Mot3.readSteps() >= round(((800 * 16) / 360) * sol1_Cotovelo)){ // Passos no Cotovelo
+  if (Mot3.readSteps() >= round(((800 * 16) / 360) * sol1_Cotovelo)) { // Passos no Cotovelo
     passos[2] = Mot3.readSteps() - round(((800 * 16) / 360) * sol1_Cotovelo);
-  }else{
-    passos[2] = round(((800 * 16) / 360) * sol1_Cotovelo) - Mot3.readSteps(); 
+  } else {
+    passos[2] = round(((800 * 16) / 360) * sol1_Cotovelo) - Mot3.readSteps();
   }
 
-  if(Mot4.readSteps() >= round(((800 * 4) / 360) * sol1_Punho)){
+  if (Mot4.readSteps() >= round(((800 * 4) / 360) * sol1_Punho)) {
     passos[3] = Mot4.readSteps() - round(((800 * 4) / 360) * sol1_Punho);
-  }else{
-    passos[3] = round(((800 * 4) / 360) * sol1_Punho) - Mot4.readSteps(); 
+  } else {
+    passos[3] = round(((800 * 4) / 360) * sol1_Punho) - Mot4.readSteps();
   }
 
-  if(passos[1] >= passos[2] && passos[1] >= passos[3]){
+  if (passos[1] >= passos[2] && passos[1] >= passos[3]) {
     comparador[0] = passos[1];
-  }else if(passos[2] >= passos[3]){
+  } else if (passos[2] >= passos[3]) {
     comparador[0] = passos[2];
-  }else{
+  } else {
     comparador[0] = passos[3];
   }
 
   //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
-  if(Mot2.readSteps() >= round(((800 * 20) / 360) * sol2_Base)){ // Passos na Base
+  if (Mot2.readSteps() >= round(((800 * 20) / 360) * sol2_Base)) { // Passos na Base
     passos[1] = Mot2.readSteps() - round(((800 * 20) / 360) * sol2_Base);
-  }else{
-    passos[1] = round(((800 * 20) / 360) * sol2_Base) - Mot2.readSteps(); 
+  } else {
+    passos[1] = round(((800 * 20) / 360) * sol2_Base) - Mot2.readSteps();
   }
 
-  if(Mot3.readSteps() >= round(((800 * 16) / 360) * sol2_Cotovelo)){ // Passos no Cotovelo
+  if (Mot3.readSteps() >= round(((800 * 16) / 360) * sol2_Cotovelo)) { // Passos no Cotovelo
     passos[2] = Mot3.readSteps() - round(((800 * 16) / 360) * sol2_Cotovelo);
-  }else{
-    passos[2] = round(((800 * 16) / 360) * sol2_Cotovelo) - Mot3.readSteps(); 
+  } else {
+    passos[2] = round(((800 * 16) / 360) * sol2_Cotovelo) - Mot3.readSteps();
   }
 
-  if(Mot4.readSteps() >= round(((800 * 4) / 360) * sol2_Punho)){
+  if (Mot4.readSteps() >= round(((800 * 4) / 360) * sol2_Punho)) {
     passos[3] = Mot4.readSteps() - round(((800 * 4) / 360) * sol2_Punho);
-  }else{
-    passos[3] = round(((800 * 4) / 360) * sol2_Punho) - Mot4.readSteps(); 
+  } else {
+    passos[3] = round(((800 * 4) / 360) * sol2_Punho) - Mot4.readSteps();
   }
 
-  if(passos[1] >= passos[2] && passos[1] >= passos[3]){
+  if (passos[1] >= passos[2] && passos[1] >= passos[3]) {
     comparador[1] = passos[1];
-  }else if(passos[2] >= passos[3]){
+  } else if (passos[2] >= passos[3]) {
     comparador[1] = passos[2];
-  }else{
+  } else {
     comparador[1] = passos[3];
   }
 
-  if(comparador[0]>=comparador[1]){
+  if (comparador[0] >= comparador[1]) {
     //solução 1
     rA = altura; //altura
     rB = sol1_Base; //base
     rC = sol1_Cotovelo; //cotovelo
     rR = sol1_Punho; //punho
-  }else{
+  } else {
     //solução 2
     rA = altura; //altura
     rB = sol2_Base; //base
@@ -448,19 +461,19 @@ void cinematicaInversa(long setX, long setY, int angR, long altura) {
   //escrita nos motores
   if (rB <= limiteMaxBase && rB >= limiteMinBase) {
     registradores[0] = rB;
-    Mot2.writeSteps(round(((800 * 20) / 360)* rB));  
+    Mot2.writeSteps(round(((800 * 20) / 360)* rB));
   }
   if (rC <= limiteMaxCotovelo && rC >= limiteMinCotovelo) {
     registradores[1] = rC;
-    Mot3.writeSteps(round(((800 * 16) / 360)* rC));  
+    Mot3.writeSteps(round(((800 * 16) / 360)* rC));
   }
   if (rR <= limiteMaxPunho && rR >= limiteMinPunho) {
     registradores[2] = rR;
-    Mot4.writeSteps(round(((800 * 4) / 360)* rR));  
+    Mot4.writeSteps(round(((800 * 4) / 360)* rR));
   }
   if (altura <= limiteMaxAltura && altura >= limiteMinAltura) {
     registradores[3] = altura;
-    Mot1.writeSteps(round(100 * altura));  
+    Mot1.writeSteps(round(100 * altura));
   }
 }
 
@@ -474,9 +487,9 @@ void loopCinematica() {
     cinematicaInversa(X, Y, R, Z);
   }
   //Se o motor estiver em movimento
-  if(Mot1.moving() || Mot2.moving() || Mot3.moving() || Mot4.moving()){
+  if (Mot1.moving() || Mot2.moving() || Mot3.moving() || Mot4.moving()) {
     registradores[7] = 1;
-  }else{
+  } else {
     registradores[7] = 0;
   }
 }
@@ -486,7 +499,7 @@ void loopCinematica() {
 
 
 void ajustaVelocidade(int nivel) { //efetua a configuração da velocidade das juntas de forma proporcional
-  if(nivel < 10){
+  if (nivel < 10) {
     nivel = 10;
   }
   registradores[5] = nivel;
@@ -501,17 +514,17 @@ void ajustaVelocidade(int nivel) { //efetua a configuração da velocidade das j
 }
 
 
-int getData(int dataIndex){
-  switch (dataIndex){
-  case 0: //retorna a posição atual da base
-    return 0;
-    break;
-  case 1:
-    return 0;
-    break;
-  default:
-    return 0;
-    break;
+int getData(int dataIndex) {
+  switch (dataIndex) {
+    case 0: //retorna a posição atual da base
+      return 0;
+      break;
+    case 1:
+      return 0;
+      break;
+    default:
+      return 0;
+      break;
   }
 }
 /*void testeMotorSerial(char dadodaserial) {
@@ -557,4 +570,4 @@ int getData(int dataIndex){
       //Serial.println(Mot4.readSteps());
       break;
   }
-}*/
+  }*/

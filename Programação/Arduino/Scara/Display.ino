@@ -51,13 +51,13 @@ void configuraDisplay() {
 void resetaBuf() {
   buf[0] = 1000;
   buf[1] = 1000;
-  buf[2] = 1000;
-  buf[3] = 1000;
-  buf[4] = 1000;
+  //buf[2] = 1000;
+  //buf[3] = 1000;
+  //buf[4] = 1000;
   buf[5] = 1000;
-  buf[6] = 1000;
-  buf[7] = 1000;
-  buf[8] = 1000;
+  //buf[6] = 1000;
+  //buf[7] = 1000;
+  //buf[8] = 1000;*/
 }
 
 void loopDisplay() {
@@ -89,7 +89,9 @@ void loopDisplay() {
       tela_A = 12;
     }
   }
-
+  if(modo == 1 && tela_A != 3){
+    tela_A = 1;
+  }
   if (tela_A != prev_tela_A) { //verifica se necessita mudar o plano de fundo
     lcd.clear(); //na teoria não sera necessário
     prev_tela_A = tela_A; // essa variavel serve para evitar atualização desnecessária do display
@@ -310,7 +312,7 @@ void loopDisplay() {
         lcd.print("     ");
         lcd.setCursor(10, 0);
         lcd.print(F);
-        lcd.print(B00100101);
+        lcd.print("%");
         buf[0] = F;
       }
       if (buf[1] != Vel) { //verifica se houve alteração na variavel e reescreve >> serve para todos os proximos
@@ -380,7 +382,7 @@ void loopDisplay() {
         lcd.print("     ");
         lcd.setCursor(10, 0);
         lcd.print(F);
-        lcd.print(B00100101);
+        lcd.print("%");
         buf[0] = F;
       }
       if (buf[5] != multiplicador) { //verifica se houve alteração na variavel e reescreve >> serve para todos os proximos
