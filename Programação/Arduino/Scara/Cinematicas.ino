@@ -318,8 +318,8 @@ void cinematicaDireta(int disA, int angB, int angC, int angR) { //altura, base, 
     rX = round(cos(radians(180) - (radians(angB) + radians(90) - angInterno)) * distanciaBasePunho * (-1));
     rY = round(sin(radians(180) - (radians(angB) + radians(90) - angInterno)) * distanciaBasePunho);
   }
-  registradores[8] = rX;
-  registradores[9] = rY;
+  //registradores[8] = rX;
+  //registradores[9] = rY;
   registradores[3] = disA * -1;
   rZ = disA * 100;
   rR = rX + rY;
@@ -487,7 +487,7 @@ void loopCinematica() {
     cinematicaInversa(X, Y, R, Z);
   }
   //Se o motor estiver em movimento
-  if (Mot1.moving() || Mot2.moving() || Mot3.moving() || Mot4.moving()) {
+  if (Mot1.moving() || Mot2.moving() || Mot3.moving() || Mot4.moving() || servo.moving()) {
     registradores[7] = 1;
   } else {
     registradores[7] = 0;

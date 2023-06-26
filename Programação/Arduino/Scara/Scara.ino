@@ -76,6 +76,7 @@ void setup() {
   configuraCinematica(); //configura e inicia a biblioteca responsável pelo controle dos motores
   configuraSerial(); //configura e inicia a comunicação serial com o ESP
   //homing(); // efetua o homing do robô
+  delay(4000);
 }
 
 int angulo = 0;

@@ -38,6 +38,8 @@ extern byte Vel;
 extern void cinematicaDireta(int disA, int angB, int angC, long angR);
 extern byte selecaoCinematica;
 extern long buf[8];
+extern int registradores[20];
+
 void configuraBotoes();
 void loopBotoes();
 button_t leituraMPR121(void);
@@ -64,10 +66,12 @@ void loopBotoes() { //usa em conjunto a biblioteca mobatools para as funções d
     if (bitRead(getPCF, switchModo) == 1) {
       modo = 1;
       funcao = 0;
+      registradores[9] = modo;
       //Serial.println("Modo Remoto");
     } else {
       //Serial.println("Modo Local");
       modo = 0;
+      registradores[9] = modo;
     }
   }
   if (bitRead(getMPR, capModo) != bitRead(lastMPR, capModo)) {
@@ -218,6 +222,15 @@ void loopBotoes() { //usa em conjunto a biblioteca mobatools para as funções d
   if (bitRead(getMPR, capCentro) != bitRead(lastMPR, capCentro)) {
     if (bitRead(getMPR, capCentro) == 1) {
       //Serial.println("Centro Pressionado");
+      if(modo == 1){// verifica se está em modo modbus
+        if(registradores[8] == 0){ //caso o botao for pressionado altera para o start ou stop do programa
+          registradores[8] = 100;
+        }else{
+          registradores[8] = 0;
+        }
+      }else{
+        registradores[8] = 0;
+      }
       if (funcao == 3) {
         funcao = 0;
         //0 tela normal
