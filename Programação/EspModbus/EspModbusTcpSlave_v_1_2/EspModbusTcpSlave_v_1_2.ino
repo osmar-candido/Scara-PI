@@ -1,6 +1,9 @@
 /***********************
- * Autor: 
+ * Autor:
+ *     Jhon Valencia - TrialCommand
+ * Editor: 
  *     Osmar Candido Junior
+ * 
  * Versão: 
  *     1.2 Estável
  * Descrição: 
